@@ -13,3 +13,15 @@ iNSERT INTO profile (
     $1
 )
 RETURNING *;
+
+-- name: UpdateProfileBank :exec
+UPDATE profile SET bank = $2
+WHERE id = $1;
+
+-- name: UpdateProfileBankAccountNumber :exec
+UPDATE profile SET bank_account_number = $2
+WHERE id = $1;
+
+-- name: UpdateProfileClearingNumber :exec
+UPDATE profile SET clearing_number = $2
+WHERE id = $1;

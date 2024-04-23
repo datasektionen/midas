@@ -79,3 +79,48 @@ func (q *Queries) ListProfiles(ctx context.Context) ([]Profile, error) {
 	}
 	return items, nil
 }
+
+const updateProfileBank = `-- name: UpdateProfileBank :exec
+UPDATE profile SET bank = $2
+WHERE id = $1
+`
+
+type UpdateProfileBankParams struct {
+	ID   int32
+	Bank string
+}
+
+func (q *Queries) UpdateProfileBank(ctx context.Context, arg UpdateProfileBankParams) error {
+	_, err := q.db.Exec(ctx, updateProfileBank, arg.ID, arg.Bank)
+	return err
+}
+
+const updateProfileBankAccountNumber = `-- name: UpdateProfileBankAccountNumber :exec
+UPDATE profile SET bank_account_number = $2
+WHERE id = $1
+`
+
+type UpdateProfileBankAccountNumberParams struct {
+	ID                int32
+	BankAccountNumber string
+}
+
+func (q *Queries) UpdateProfileBankAccountNumber(ctx context.Context, arg UpdateProfileBankAccountNumberParams) error {
+	_, err := q.db.Exec(ctx, updateProfileBankAccountNumber, arg.ID, arg.BankAccountNumber)
+	return err
+}
+
+const updateProfileClearingNumber = `-- name: UpdateProfileClearingNumber :exec
+UPDATE profile SET clearing_number = $2
+WHERE id = $1
+`
+
+type UpdateProfileClearingNumberParams struct {
+	ID             int32
+	ClearingNumber string
+}
+
+func (q *Queries) UpdateProfileClearingNumber(ctx context.Context, arg UpdateProfileClearingNumberParams) error {
+	_, err := q.db.Exec(ctx, updateProfileClearingNumber, arg.ID, arg.ClearingNumber)
+	return err
+}
