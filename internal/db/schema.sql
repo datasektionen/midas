@@ -1,6 +1,6 @@
 CREATE TABLE profile (
     id SERIAL PRIMARY KEY, 
-    kth_id TEXT NOT NULL,
+    kth_id TEXT UNIQUE NOT NULL,
     bank TEXT NOT NULL DEFAULT '',
     bank_account_number TEXT NOT NULL DEFAULT '',
     clearing_number TEXT NOT NULL DEFAULT ''
