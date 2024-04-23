@@ -1,13 +1,14 @@
 package main
 
 import (
-    "context"
+	"context"
 	"log"
 	"reflect"
 
 	"github.com/jackc/pgx/v5"
 
-    "github.com/datasektionen/midas/internal/db"
+	"github.com/datasektionen/midas/internal/db"
+	"github.com/datasektionen/midas/internal/profile"
 )
 
 func run() error {
@@ -29,20 +30,30 @@ func run() error {
 	log.Println(profiles)
 
 	// create a profile
-	insertedProfile, err := queries.CreateProfile(ctx, "emilhul")
+	created, err := profile.GetOrCreate(ctx, queries, "emilhul")
 	if err != nil {
 		return err
 	}
-	log.Println(insertedProfile)
+	log.Println(created)
 
-	// get the profile we just inserted
-	fetchedProfile, err := queries.GetProfile(ctx, insertedProfile.KthID)
+	// create authenticedProile
+	ap := profile.ValidateProfile(created);
+
+	// Update bank
+	ap.UpdateBank(ctx, queries, "Handelsbanken");
+	ap.UpdateBankAccount(ctx, queries, "1337420");
+	ap.UpdateClearingNumber(ctx, queries, "666");
+	log.Println(created)
+
+	// get a profile
+	fetched, err := profile.GetOrCreate(ctx, queries, "emilhul")
 	if err != nil {
 		return err
 	}
+	log.Println(fetched)
 
-	// prints true
-	log.Println(reflect.DeepEqual(insertedProfile, fetchedProfile))
+	// prints true (ap is a wrapper to a reference to created)
+	log.Println(reflect.DeepEqual(fetched, created))
 
 	// list all profiles again
 	profiles, err = queries.ListProfiles(ctx)
