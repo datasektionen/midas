@@ -17,10 +17,25 @@ func GetOrCreate(
 	q *db.Queries,
 	kthID string,
 ) (*db.Profile, error) {
-	profile, err := q.GetProfile(ctx, kthID);
+	profile, err := Get(ctx, q, kthID)
 	if err == pgx.ErrNoRows {
-		profile, err = q.CreateProfile(ctx, kthID);
+		profile, err = Create(ctx, q, kthID);
 	}
+	if err != nil {
+		return nil, err
+	}
+
+	return profile, nil
+};
+
+// Create returns a [github.com/datasektionen/midas/internal.db.Profile]
+// by fetching it from the database. Profile is nil in case of error.
+func Create(
+	ctx context.Context,
+	q *db.Queries,
+	kthID string,
+) (*db.Profile, error) {
+	profile, err := q.CreateProfile(ctx, kthID);
 	if err != nil {
 		return nil, err
 	}
@@ -28,79 +43,18 @@ func GetOrCreate(
 	return &profile, nil
 };
 
-// A validatedProfile is a wrapper of 
-// [github.com/datasektionen/midas/internal.db.Profile] allowing for updates
-// to the data.
-type validatedProfile struct {
-	profile *db.Profile
-}
-
-// ValidateProfile wraps a [github.com/datasektionen/midas/internal.db.Profile]
-// returning a 
-// [github.com/datasektionen/midas/internal.profile.validatedProfile].
-func ValidateProfile(p *db.Profile) validatedProfile {
-	return validatedProfile{profile: p};
-}
-
-// UpdateBank updates the bank name field of a 
-// [github.com/datasektionen/midas/internal.profile.validatedProfile] as well
-// as the underlying database row. 
-func (v *validatedProfile) UpdateBank(
+// Create returns a [github.com/datasektionen/midas/internal.db.Profile]
+// by creating a new user with that kthID in the database. 
+// Profile is nil in case of error.
+func Get(
 	ctx context.Context,
-	q *db.Queries, 
-	bankName string,
-) error {
-	params := db.UpdateProfileBankParams{ID: v.profile.ID, Bank: bankName};
-
-	if err := q.UpdateProfileBank(ctx, params); err != nil {
-		return err
+	q *db.Queries,
+	kthID string,
+) (*db.Profile, error) {
+	profile, err := q.GetProfile(ctx, kthID);
+	if err != nil {
+		return nil, err
 	}
 
-	v.profile.Bank = bankName;
-
-	return nil
-}
-
-// UpdateBankAccount updates the bank account number field of a 
-// [github.com/datasektionen/midas/internal.profile.validatedProfile] as well
-// as the underlying database row. 
-func (v *validatedProfile) UpdateBankAccount(
-	ctx context.Context,
-	q *db.Queries, 
-	bankAccountNumber string,
-) error {
-	params := db.UpdateProfileBankAccountNumberParams{
-		ID: v.profile.ID,
-		BankAccountNumber: bankAccountNumber,
-	};
-
-	if err := q.UpdateProfileBankAccountNumber(ctx, params); err != nil {
-		return err
-	}
-
-	v.profile.BankAccountNumber = bankAccountNumber;
-
-	return nil
-}
-
-// UpdateClearingNumber updates the clearing number field of a 
-// [github.com/datasektionen/midas/internal.profile.validatedProfile] as well
-// as the underlying database row. 
-func (v *validatedProfile) UpdateClearingNumber(
-	ctx context.Context,
-	q *db.Queries, 
-	clearingNumber string,
-) error {
-	params := db.UpdateProfileClearingNumberParams{
-		ID: v.profile.ID, 
-		ClearingNumber: clearingNumber,
-	};
-
-	if err := q.UpdateProfileClearingNumber(ctx, params); err != nil {
-		return err
-	}
-
-	v.profile.ClearingNumber = clearingNumber;
-
-	return nil
-}
+	return &profile, nil
+};
