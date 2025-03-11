@@ -1,13 +1,13 @@
 CREATE TABLE profile (
     id SERIAL PRIMARY KEY, 
-    kth_id TEXT UNIQUE NOT NULL,
+    ugKthid TEXT UNIQUE NOT NULL,
     bank TEXT NOT NULL DEFAULT '',
     bank_account_number TEXT NOT NULL DEFAULT '',
     clearing_number TEXT NOT NULL DEFAULT ''
 );
 
 CREATE TABLE payment (
-    id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY, 
     paid_at TIMESTAMP NOT NULL,
     paid_by INTEGER REFERENCES profile NOT NULL,
     paid_to INTEGER REFERENCES profile NOT NULL
@@ -19,7 +19,6 @@ CREATE TABLE expense (
     id SERIAL PRIMARY KEY,
     kind expense_type NOT NULL,
     description TEXT NOT NULL DEFAULT '',
-    is_digital BOOLEAN NOT NULL,
     accounting_date DATE NOT NULL,
     created_at TIMESTAMP NOT NULL,
     confirmed_at TIMESTAMP,
@@ -31,13 +30,14 @@ CREATE TABLE expense (
 
 CREATE TABLE expense_invoice (
     id INTEGER PRIMARY KEY REFERENCES expense,
+    invoice_date DATE NOT NULL,
     due_date DATE NOT NULL
 );
 
 CREATE TABLE expense_part (
     id SERIAL PRIMARY KEY,
     expense_id INTEGER REFERENCES expense NOT NULL,
-    ammount DECIMAL NOT NULL,
+    amount DECIMAL NOT NULL,
     comitte TEXT NOT NULL,
     budget_line TEXT NOT NULL,
     cost_centre TEXT NOT NULL,
